@@ -12,7 +12,7 @@ Joaquim Filipe
 
 201801899, Daniel Lachkeev
 
-## 1. Instalação do Ambiente
+## 1. Instalação do ambiente
 
 - Para proceder à instalação da aplicação, deverá registar-se em: http://www.lispworks.com/downloads/index.html
 
@@ -20,7 +20,7 @@ Joaquim Filipe
 
 - Por último, deve executar o ficheiro de instalação.
 
-## 2. Instalação do Programa
+## 2. Instalação do programa
 
 - Deve proceder à transferência e descompactação dos ficheiros necessários ao funcionamento do programa Dots & Boxes:
   - `problemas.dat` - ficheiro que contém os vários problemas de jogo.
@@ -36,7 +36,7 @@ Joaquim Filipe
 
 - Em `projeto.lisp`, na função `problemas-menu`, deve alterar o diretório do ficheiro `problemas.dat` para o correspondente ao que possui no seu computador.
 
-## 3. Como Utilizar
+## 3. Como utilizar
 
 - Para iniciar o programa, no `Listener`, deve executar a instrução `(main-menu)`, que abre o menu principal do programa, fornecendo acesso às suas funcionalidades.
 - Em seguida, basta seguir todas as instruções devidamente descritas nos menus de interação.
