@@ -23,4 +23,15 @@ Joaquim Filipe
 
 ### problemas.dat
 
-- 
+- `6 problemas` - configurações diferentes de tabuleiros de jogo iniciais.
+
+### procura.lisp
+
+- `novo-sucessor` - função de procura de um novo sucessor de um nó de teste.
+- `sucessores` - função de procura dos sucessores de um nó, segundo um algoritmo e um valor de profundidade (opcional) fornecidos.
+- `nivel-no` - função que determina o nível de um nó fornecido.
+- `abertos-bfs` - função que determina a lista de nós abertos, segundo o algoritmo BFS.
+- `abertos-dfs` - função que determina a lista de nós abertos, segundo o algoritmo DFS.
+- `no-existep` - função que verifica a existência de um determinado nó.
+- `bfs` - função que implementa o algoritmo BFS.
+- `dfs` - função que implementa o algoritmo DFS.
