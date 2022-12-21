@@ -35,3 +35,24 @@ Joaquim Filipe
 - `no-existep` - função que verifica a existência de um determinado nó.
 - `bfs` - função que implementa o algoritmo BFS.
 - `dfs` - função que implementa o algoritmo DFS.
+
+### projeto.lisp
+
+- `main-menu` - função responsável por gerar o menu inicial da aplicação.
+- `problems-menu` - função responsável por gerar o menu para escolha do problema.
+- `algorithms-menu` - função responsável por gerar o menu para escolha do algoritmo.
+
+### puzzle.lisp
+- `tabuleiro-teste` - função que retorna um tabuleiro de teste.
+- `tabuleiro-teste2` - função que retorna um tabuleiro de teste.
+- `tabuleiro-teste3` - função que retorna um tabuleiro de teste.
+- `get-arcos-horizontais` - função que retorna os arcos horizontais de um tabuleiro.
+- `get-arcos-verticais` - função que retorna os arcos verticais de um tabuleiro.
+- `get-arco-na-posicao` - função que retorna um arco numa determinada posicao.
+- `substituir` - função que substitui um arco, de forma recursiva.
+- `arco-na-posicao` - função para inserção de um arco, numa determinada posição.
+- `arco-horizontal` - função para inserção de um arco horizontal.
+- `arco-vertical` - função para inserção de um arco vertical.
+- `caixa-fechada` - função que determina se uma caixa está fechada, segundo uma determinada posição.
+- `caixas-fechadas` - função que determina as caixas fechadas de um tabuleiro, começando numa determinada posição.
+- `n-caixas-fechadas` - função que determina o número de caixas fechadas de um tabuleiro.
