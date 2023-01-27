@@ -18,10 +18,15 @@ Joaquim Filipe
 
 - `x` - linha.
 - `y` - coluna.
+- `tabuleiro` - 2 listas de arcos, compostos cada um por linhas.
+- `linha(s)` - lista de valores 0 a 2 que correspondem a uma linha horizontal ou vertical no tabuleiro.
+- `jogador` - valor 1 ou 2. Jogador 1 começa primeiro.
+- `n` e `m`. Dimensão do tabuleiro. n linhas por m colunas.
 
 ### 1.2 Convenções
 
 - `funções` - escritas em letra minúscula com palavras separadas por `"-"`.
+- Utilização de recursividade sempre que é possível exceto nos casos de interação e input/output.
 
 ## 2. Introdução
 
