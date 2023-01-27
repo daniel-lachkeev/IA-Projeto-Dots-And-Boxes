@@ -95,9 +95,11 @@ Em todos os ficheiros, qualquer função que acaba em "-teste" devolve uma estru
 - `alpha-beta` - função que implementa o algoritmo Alfabeta.
 Foram definidas 3 funções locais que executam o algoritmo principal iter. Em caso de se alcançar a profundidade máxima ou condição de vitória (preenchimento do tabuleiro) é devolvida uma avalição que representa quão bom é o estado atual comparado com o outro jogador. 
 Para os cortes alfa-beta são chamadas novamente as funções respetivas para o resto dos sucessores ignorando o atual. 
+As avaliações parecem ser iguais independentemente do jogador selecionado.
 
 Em profundidade 3 de um nó inicial usando como base a figura 1 isto é as estatísticas.
 ```
+CL-USER 2 > (time (alpha-beta (no-teste) 3 1))
 Timing the evaluation of (ALPHA-BETA (NO-TESTE) 3 1)
 
 User time    =        0.218
@@ -106,7 +108,24 @@ Elapsed time =        0.215
 Allocation   = 88625536 bytes
 0 Page faults
 GC time      =        0.000
-70```
+70
+```
+
+Com profundidade 4 já se começa a sentir o tempo que decorre.
+```
+CL-USER 1 > (time (alpha-beta (no-teste) 4 1))
+Timing the evaluation of (ALPHA-BETA (NO-TESTE) 4 1)
+
+User time    =        2.828
+System time  =        0.031
+Elapsed time =        2.822
+Allocation   = 1469000120 bytes
+0 Page faults
+GC time      =        0.078
+92
+```
+
+Dado que o tempo máximo é de 20ms, não nos enche com confiança que esta implementação do algoritmo seja eficiente.
 
 ### 3.3 jogo.lisp
 
@@ -145,15 +164,14 @@ O foco primário foi garantir que todas as operações e funções auxiliares pa
 De seguida foi desenvolvida a codificação das regras e processos do jogo de modo que possamos ter um ciclo de jogadas até a condição de vitória.
 Por último quando o jogo conseguia minimamente correr até o final, procedemos a implementação do algoritmo alfabeta.
 
-Em muitas funções de alto nível, há a utilização de várias funções auxiliares encadeadas. A invocação de funções recursivas exige uma função de maior nível quando se pretende obter o resultado final. Isto é porque a utilização de scopes de funções não era algo evidente até o final do desenvolvimento. 
+Em muitas funções de alto nível, há a utilização de várias funções auxiliares encadeadas. A invocação de funções recursivas exige uma função de maior nível quando se pretende obter o resultado final. Isto é porque a utilização de scopes de funções não era algo evidente a nos até o final do desenvolvimento. 
 
-
-
+Para a escrita de ficheiros, optou-se por usar um caminho hardcoded visto que não é possível de uma maneira fácil trabalhar pelo caminho relativo.
 
 ## 5. Limitações
 
 - Sem possibilidade de devolver a próxima jogada ótima do computador apesar de alfabeta estar implementado.
-- Sem otimizações de alfabeta como por exemplo pesquisa quiscente e ordenação de nós.
-- Não há métricas de desempenho tal como o limite de tempo.
+- Sem otimizações de alfabeta como por exemplo pesquisa quiscente, ordenação de nós e memoização.
+- Não há limite de tempo implementado visto que não há jogadas de computador que usem alfa-beta.
 - Utilização de variáveis globais em detrimento de scopes locais.
 ...
