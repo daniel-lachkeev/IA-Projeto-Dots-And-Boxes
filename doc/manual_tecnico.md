@@ -35,6 +35,7 @@ Joaquim Filipe
 - `no-existep` - função que verifica a existência de um determinado nó.
 - `bfs` - função que implementa o algoritmo BFS.
 - `dfs` - função que implementa o algoritmo DFS.
+- `a-star` - função que implementa o algoritmo A*
 
 ### projeto.lisp
 
@@ -56,3 +57,27 @@ Joaquim Filipe
 - `caixa-fechada` - função que determina se uma caixa está fechada, segundo uma determinada posição.
 - `caixas-fechadas` - função que determina as caixas fechadas de um tabuleiro, começando numa determinada posição.
 - `n-caixas-fechadas` - função que determina o número de caixas fechadas de um tabuleiro.
+- `solucaop` - verifica se o tabuleiro corresponde a uma solução
+- `n-linhas` - conta nº de linhas de um tabuleiro
+- `base-heuristic` - heurística do enunciado
+- `my-heuristic` - heurística nossa implementada
+- `operadores` - lista de operadores ao estado
+- `cria-no` - cria uma estrutura de dados adequado ao problema
+- `calcular-heuristica` - Calcula heurística de uma função de heurística arbitrária
+- `gerar-jogadas-horizontais` - Calcula as posições de jogadas possíveis horizontais
+- `gerar-jogadas-verticais` - Calcula as posições de jogadas possíveis verticais
+
+#### Seletores:
+- `no-teste`
+- `no-teste2`
+- `no-estado`
+- `no-objetivo`
+- `no-profundidade`
+- `no-pai`
+- `no-heuristica`
+- `no-custo`
+
+## Limitações
+- Gerar sucessores de um nó
+- Correr algoritmos de pesquisa apesar de estarem implementados
+- A* não está totalmente implementado

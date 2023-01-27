@@ -40,3 +40,9 @@ Joaquim Filipe
 
 - Para iniciar o programa, no `Listener`, deve executar a instrução `(main-menu)`, que abre o menu principal do programa, fornecendo acesso às suas funcionalidades.
 - Em seguida, basta seguir todas as instruções devidamente descritas nos menus de interação.
+
+## 4. Limitações
+
+- O programa está bastante incompleto pelo que não consegue correr requisitos elementares tal como
+a escolha de um problema para ser jogado ou resolvido
+- Não apresenta um tabuleiro em modo de texto.

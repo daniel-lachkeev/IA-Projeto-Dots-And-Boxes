@@ -25,7 +25,9 @@
 )
 
 (defun tabuleiro-teste4 ()
-  "Retorna um tabuleiro exemplo 5x6, com x caixas fechadas, x arcos"
+  "Retorna um tabuleiro exemplo 5x6, com 12 caixas fechadas, 51/71 arcos, 
+20 jogadas possíveis, 12 horizontais e 8 verticais "
+  "Figura 1 do enunciado"
  '(
 (;arcos horizontais
 (1 2 1 1 0 2)
@@ -47,7 +49,42 @@
 )
 )
 
-;; Para n = 5, m = 6, deve gerar 6x6 + 7x5
+(defun tabuleiro-teste5 ()
+  "Retorna um tabuleiro exemplo 5x6, com todas as caixas fechadas, 71 arcos"
+ '(
+(;arcos horizontais
+(1 2 1 1 1 2)
+(2 1 1 1 1 1)
+(1 2 1 1 2 1)
+(1 1 1 2 2 1)
+(1 2 1 1 1 1)
+(1 1 2 1 2 1)
+)
+(;arcos verticais
+(1 1 1 1 1)
+(2 1 1 2 2)
+(2 1 1 2 1)
+(1 2 2 1 1)
+(1 2 2 1 1)
+(1 1 2 1 2)
+(2 2 1 2 1)
+)
+)
+)
+
+(defun estado-teste()
+  "Retorna um estado faltando com uma jogada restante"
+'((((0 1 1 1 1 2) (1 2 1 1 1 1) (1 1 2 1 2 1) (1 1 1 1 2 1) (2 2 2 1 2 2) (2 1 1 1 1 2)) ((1 2 1 2 1) (1 1 2 1 1) (1 1 1 2 1) (2 2 1 2 2) (1 2 2 1 2) (1 1 1 2 2) (1 2 1 1 1))) (0 1))
+)
+
+
+(defvar abertos '())
+(defvar fechados '())
+(defvar a (tabuleiro-teste4))
+
+;; Função que gera um tabuleiro de qualquer tamanho
+;; O tabuleiro vai ter n x m caixas.
+;; Para n = 5, m = 6, deve gerar 6x6 + 7x5 arcos, 71 arcos
 (defun tabuleiro (n m)
   (list (arcos m (1+ n)) (arcos n (1+ m))))
 
@@ -93,36 +130,28 @@
    ((= x 1) (cons (substituir y (car list) value) (cdr list)))
    (t (cons (car list) (arco-na-posicao (1- x) y (cdr list) value)))))
 
+(defun verificar-arcop (x y lista-arcos)
+  ;; Verifica se é possível colocar um arco numa certa posição
+  ;; lista-arcos é uma lista de arcos horizontais ou verticais de um tabuleiro
+  (cond 
+   ((null lista-arcos) nil)
+   ((or (< x 1) (< y 1) 
+        (> x (length lista-arcos)) (> y (length (first lista-arcos))) 
+        (/= (get-arco-na-posicao2 x y lista-arcos) 0)) nil)
+   (t t))
+)
+
 (defun arco-horizontal (x y tabuleiro &optional (jogador 1))
 	(cond 
 		((null tabuleiro) nil)
-		((or (< x 1) (< y 1) 
-			(> x (length (first (car tabuleiro)))) (> y (length (car tabuleiro))) 
-			(/= (get-arco-na-posicao2 x y (car tabuleiro)) 0)) nil)
+		((null (verificar-arcop x y (car tabuleiro))) nil)
 		(t (cons (arco-na-posicao x y (get-arcos-horizontais tabuleiro) jogador) (cdr tabuleiro)))))
 
 (defun arco-vertical (x y tabuleiro &optional (jogador 1))
 	(cond 
 		((null tabuleiro) nil)
-		((or (< x 1) (< y 1) 
-			(> x (length (second (car tabuleiro)))) (> y (length (car tabuleiro))) 
-			(/= (get-arco-na-posicao2 x y (cadr tabuleiro)) 0)) nil)
+		((null (verificar-arcop x y (cadr tabuleiro))) nil)
 		(t (list (car tabuleiro) (arco-na-posicao x y (get-arcos-verticais tabuleiro) jogador)))))
-
-
-; Verifica se o tabuleiro corresponde à solução pretendida 
-; Se tiver o número de caixas fechadas desejadas
-(defun solucaop (tabuleiro objetivo-caixas)
-  (cond
-   ((>= (n-contar-caixas tabuleiro) objetivo-caixas) t)
-   (t nil)))
-
-; conta nº de linhas de um tabuleiro
-(defun n-linhas (tabuleiro)
-  (cond
-   ((null tabuleiro) 0)
-   ((listp (car tabuleiro)) (+ (n-linhas (car tabuleiro)) (n-linhas (cdr tabuleiro))))
-   (t (+ (car tabuleiro) (n-linhas (cdr tabuleiro))))))
 
 
 ; Devolve todas as posições possíveis apartir dos arcos horizontais
@@ -144,29 +173,29 @@
 ;; Conta as linhas (x, y) (x+1, y), (y, x), (y+1,x) que existem ao redor de uma caixa
 ;; Se a soma for 4 retorna 1 (caixa fechada) caso contrário retorna 0
 ;; Se estiver fora dos limites do tabuleiro, devolve nil
-(defun caixa-fechada (x y tabuleiro)
+(defun caixa-fechada (x y tabuleiro &optional (n-arcos 4))
     (cond
         ((or (< x 1) (< y 1) (> y (length (first (car tabuleiro)))) (> x (1- (length (car tabuleiro))))) nil)
         ((= (+ 
             (get-arco-na-posicao2 x y (car tabuleiro))
             (get-arco-na-posicao2 (1+ x) y (car tabuleiro)) 
             (get-arco-na-posicao2 y x (cadr tabuleiro)) 
-            (get-arco-na-posicao2 (1+ y) x (cadr tabuleiro))) 4) 1)
+            (get-arco-na-posicao2 (1+ y) x (cadr tabuleiro))) n-arcos) 1)
         (t 0)))
 
 ;; Devolve uma lista contendo as posições baseados em arcos horizontais 
 ;; onde representam uma caixa fechada
-(defun caixas-fechadas (positions tabuleiro)
+(defun caixas-fechadas (positions tabuleiro &optional (n-arcos 4))
   (remove-if (lambda (posicao)
                (let ((x (first posicao))
                      (y (second posicao)))
-               (= (caixa-fechada x y tabuleiro) 0)))
+               (= (caixa-fechada x y tabuleiro n-arcos) 0)))
            positions))
 
-(defun n-caixas-fechadas (positions tabuleiro)
+(defun n-caixas-fechadas (positions tabuleiro &optional (n-arcos 4))
   (cond ((null positions) nil)
-        ((listp (car positions)) (cons (caixas-fechadas (car positions) tabuleiro) (n-caixas-fechadas (cdr positions) tabuleiro)))
-        (t (caixas-fechadas positions tabuleiro))))
+        ((listp (car positions)) (cons (caixas-fechadas (car positions) tabuleiro n-arcos) (n-caixas-fechadas (cdr positions) tabuleiro n-arcos)))
+        (t (caixas-fechadas positions tabuleiro n-arcos))))
 
 (defun contar-caixas (caixas-fechadas)
   (cond ((null caixas-fechadas) 0)
@@ -176,118 +205,161 @@
 (defun n-contar-caixas (tabuleiro)
   (contar-caixas (n-caixas-fechadas (posicoes-caixas tabuleiro) tabuleiro)))
 
-; Heurística definida no enunciado
-(defun base-heuristic (tabuleiro objetivo-caixas)
-	(- objetivo-caixas (n-contar-caixas tabuleiro)))
+(defun n-caixas-quase-fechadas (tabuleiro)
+  (contar-caixas (n-caixas-fechadas (posicoes-caixas tabuleiro) tabuleiro 3))
+)
 
-; Nossa heurística
-; O objetivo é ter em conta também o nº de linhas que foram colocadas
-; Porque as jogadas que preencham muitas linhas mas que não fecham caixas
-; com eficiência deverão ser mais penalizadas.
-; Vamos partir do exemplo da figura 2 do enunciado
-; Na solução há 5 caixas e 15 linhas portanto vamos assumir que existem em
-; média 3 linhas por caixa. 
-; Vamos agora supor que temos 3 caixas fechadas e 12 linhas ao meio do jogo
-; O primeiro operador vai ser então (5-3)^3 = 8, e o segundo vai ser 
-; |15 - 12| = 3 ; A heurística total vai ser 8 + 3 = 11.
-; Agora vamos ver outro exemplo. Temos 1 caixa fechada e 15 linhas. Apesar de 
-; nº linhas coincidir, a heurística vai ser limitada severamente pelo nº de caixas.
-; (5-1)^3 + (|15-15|) = 64
-; Basicamente quanto mais perto tivermos da solução, com menor número de jogadas
-; menor é o valor da heurística ; Se estivermos numa jogada em que não há caixas 
-; para fechar, todas as jogadas seguintes vao ter a mesma heurística
-(defun my-heuristic (tabuleiro objetivo-caixas) 
-	(+ 
-		(expt (- objetivo-caixas (n-contar-caixas tabuleiro)) 3)
-		(abs (- (* 3 objetivo-caixas) (n-linhas tabuleiro)))))
+(defun n-caixas-semi-fechadas (tabuleiro)
+   (contar-caixas (n-caixas-fechadas (posicoes-caixas tabuleiro) tabuleiro 2))
+)
+
+(defun n-caixas-pouco-fechadas (tabuleiro)
+  (+ 
+   (contar-caixas (n-caixas-fechadas (posicoes-caixas tabuleiro) tabuleiro 0))
+   (contar-caixas (n-caixas-fechadas (posicoes-caixas tabuleiro) tabuleiro 1))
+))
 
 (defun operadores ()
  (list 'arco-horizontal 'arco-vertical))
 
-(defun cria-no (tabuleiro objetivo-caixas &optional (profundidade 0) (pai nil) (heuristica 0))
-  (list tabuleiro objetivo-caixas profundidade pai heuristica))
-
-(defun no-teste (tabuleiro objetivo-caixas)
-	(cond 
-		((null tabuleiro) nil)
-		(t (cria-no tabuleiro objetivo-caixas 0 nil (funcall #'base-heuristic tabuleiro objetivo-caixas)))))
-
-(defun no-teste2 (tabuleiro objetivo-caixas)
-	(cond 
-		((null tabuleiro) nil)
-		(t (cria-no tabuleiro objetivo-caixas 0 nil (funcall #'my-heuristic tabuleiro objetivo-caixas)))))
+(defun no-teste () 
+  (cria-no-alphabeta (criar-estado (tabuleiro-teste4)) 20)
+)
 
 (defun no-estado (no)
 	(first no))
 
-(defun no-objetivo (no)
-	(second no))
+(defun no-tabuleiro (no)
+  (first (no-estado no))
+)
 
-(defun no-profundidade (no)
-	(third no))
-
-(defun no-pai (no)
-  (fourth no))
-
-; Devolve o valor da heurística
-(defun no-heuristica (no)
-	(fifth no))
-
-(defun no-custo(no)
-	; Soma da profundidade e da heurística 
-	(+ (no-profundidade no) (no-heuristica no)))
-
-(defun calcular-heuristica (no heuristicaf)
-	(funcall heuristicaf (no-estado no) (no-objetivo no)))
-
-; Lista todas as posições das jogadas possíveis de fazer com linhas horizontais
+; Lista todas as posições das jogadas possíveis de fazer com uma das listas de arcos
 ; Pára quando não há mais elementos
 ; Vai para a próxima linha quando chegar ao fim da linha
 ; Se não houver linha (= 0), adiciona o x y atual às jogadas possíveis e passa para a frente
 ; Caso contrário, passa para a frente
-(defun gerar-jogadas-horizontais (lista jogadas &optional (x 1) (y 1))	
+(defun gerar-jogadas (lista jogadas &optional (x 1) (y 1))	
   (cond
    ((null lista) jogadas)
-   ((null (car lista)) (gerar-jogadas-horizontais (cdr lista) jogadas 1 (1+ y)))
+   ((null (car lista)) (gerar-jogadas (cdr lista) jogadas 1 (1+ y)))
    ((zerop (car (car lista))) 
-   	(gerar-jogadas-horizontais (cons (cdar lista) (cdr lista)) (cons (list x y) jogadas) (1+ x) y))
-   (t (gerar-jogadas-horizontais (cons (cdar lista) (cdr lista)) jogadas (1+ x) y))))
+   	(gerar-jogadas (cons (cdar lista) (cdr lista)) (cons (list y x) jogadas) (1+ x) y))
+   (t (gerar-jogadas (cons (cdar lista) (cdr lista)) jogadas (1+ x) y))))
 
-; Lista todas as posições das jogadas possíveis de fazer com linhas verticais
-; Pára quando não há mais elementos
-; Vai para a próxima coluna quando chegar ao fim da linha
-; Se não houver linha (= 0), adiciona o x y atual às jogadas possíveis e passa para a frente
-; Caso contrário, passa para a frente
-(defun gerar-jogadas-verticais (lista jogadas &optional (x 1) (y 1))	
-  (cond
-   ((null lista) jogadas)
-   ((null (car lista)) (gerar-jogadas-verticais (cdr lista) jogadas 1 (1+ y)))
-   ((zerop (car (car lista))) 
-   	(gerar-jogadas-verticais (cons (cdar lista) (cdr lista)) (cons (list x y) jogadas) (1+ x) y))
-   (t (gerar-jogadas-verticais (cons (cdar lista) (cdr lista)) jogadas (1+ x) y))))
-
-(defun novo-sucessor (no operador x y &optional (heuristica 0))
-  (let ((novo-estado (funcall operador x y (no-estado no))))
-    (cond ((null novo-estado) nil)
-    	(t (cria-no 
-    		novo-estado 
-    		(no-objetivo no) 
+(defun novo-sucessor (no operador x y)
+  (let ((novo-tabuleiro (funcall operador x y (no-tabuleiro no))))
+    (cond ((null novo-tabuleiro) nil)
+    	(t (cria-no-alphabeta 
+    		(list novo-tabuleiro (second (first no))) 
     		(1+ (no-profundidade no)) 
-    		no 
-    		(+ (no-heuristica no) heuristica))))))
+    		no)
+))))
 
-(defun sucessores-operador (jogadas no operador &optional (heuristica 0))
-  (mapcar (lambda (coord) (novo-sucessor no operador (car coord) (cadr coord) heuristica)) jogadas))
 
-(defun sucessores (no)
+(defun sucessores-operador (jogadas no operador)
+  (mapcar (lambda (coord) (novo-sucessor no operador (car coord) (cadr coord))) jogadas)
+)
+
+(defun sucessores-alphabeta (no)
   (cond
    ((null no) nil)
-   (t (append (sucessores-operador (gerar-jogadas-horizontais (car (no-estado no)) '()) a #'arco-horizontal)
-              (sucessores-operador (gerar-jogadas-verticais (cadr (no-estado no)) '()) a #'arco-vertical)))))
+   (t (append 
+       (sucessores-operador (gerar-jogadas (get-arcos-horizontais (no-tabuleiro no)) '()) no #'arco-horizontal)
+       (sucessores-operador (gerar-jogadas (get-arcos-verticais (no-tabuleiro no)) '()) no #'arco-vertical)))))
+
+(defun sucessores-jogadas (estado)
+  (cond
+   ((null estado) nil)
+   (t (append (mapcar (lambda (sublist) (append sublist (list 'arco-horizontal))) (gerar-jogadas (get-arcos-horizontais (estado-tabuleiro estado)) '())) (mapcar (lambda (sublist) (append sublist (list 'arco-vertical))) (gerar-jogadas (get-arcos-verticais (estado-tabuleiro estado)) '()))))
+))
+
+;; Funções específicas a Parte 2 do Projeto
+
+;; Cria estado vazio representado o progresso do jogo
+(defun criar-estado (tabuleiro)
+  (list tabuleiro '(0 0))
+)
+
+;; Devolve o tabuleiro do estado
+(defun estado-tabuleiro (estado) 
+  (car estado)
+)
+
+;; Devolve a quantidade de caixas fechadas pelo jogador 1
+(defun estado-caixas-jogador1 (estado)
+  (first (second estado))
+)
+
+;; Devolve a quantidade de caixas fechadas pelo jogador 2
+(defun estado-caixas-jogador2 (estado)
+  (second (second estado))
+)
+
+;; Incrementa o nº de caixas fechadas do jogador 1 por x caixas
+(defun estado-incrementar-caixas-jogador1 (estado caixas)
+  (list (estado-tabuleiro estado) (list (+ (estado-caixas-jogador1 estado) caixas) (estado-caixas-jogador2 estado)))
+)
+
+;; Incrementa o nº de caixas fechadas do jogador 2 por x caixas 
+(defun estado-incrementar-caixas-jogador2 (estado caixas)
+  (list (estado-tabuleiro estado) (list (estado-caixas-jogador1 estado) (+ (estado-caixas-jogador2 estado) caixas)))
+)
+
+(defun estado-incrementar-caixas (estado caixas jogador)
+  (cond
+   ((= jogador 1) (estado-incrementar-caixas-jogador1 estado caixas))
+   ((= jogador 2) (estado-incrementar-caixas-jogador2 estado caixas))
+   (t nil)
+))
+
+(defun estado-resultado (estado)
+  ;; Indica o jogador que ganhou tendo em conta a pontuação atual
+  ;; 1 - Jogador1 ganhou, 2 - Jogador2 ganhou, 0 - Empate
+  (let ((resultado (second estado)))
+    (cond
+     ((> (first resultado) (second resultado)) 1)
+     ((< (first resultado) (second resultado)) 2)
+     (t 0)))
+)
 
 
-(defvar abertos '())
-(defvar fechados '())
+(defun limpar-estado ()
+  (criar-estado (tabuleiro 5 6))
+)
 
-;(defvar abertos-teste (list (no-teste (tabuleiro-teste2) 5)))
-;(defvar a (no-teste (tabuleiro-teste) 5))
+; Verifica se o tabuleiro encontra-se cheio 
+; Se preencher todas as linhas do tabuleiro
+(defun tabuleiro-preenchidop (tabuleiro)
+  (cond
+   ((>= (n-linhas tabuleiro) (linhas-max tabuleiro)) t)
+   (t nil)))
+
+(defun estado-solucao (estado)
+  ;; Verifica se o jogo terminou dando a indicação do jogador que ganhou
+  (cond
+   ((null estado) nil)
+   ((tabuleiro-preenchidop (estado-tabuleiro estado)) (estado-resultado estado))
+   (t nil))
+)
+
+;; Devolve o nº de linhas máximas que poderão haver num tabuleiro
+(defun linhas-max (tabuleiro)
+  (cond 
+   ((null tabuleiro) 0)
+   ((listp (caar tabuleiro)) (+ (linhas-max (car tabuleiro)) (linhas-max (cdr tabuleiro))))
+   ((listp (car tabuleiro)) (+ (length (car tabuleiro)) (linhas-max (cdr tabuleiro))))
+   (t 0)))
+
+; conta nº de linhas preenchidas de um tabuleiro
+(defun n-linhas (tabuleiro)
+  (cond
+   ((null tabuleiro) 0)
+   ((listp (car tabuleiro)) (+ (n-linhas (car tabuleiro)) (n-linhas (cdr tabuleiro))))
+   (t (+ (car (convert-to-ones tabuleiro)) (n-linhas (cdr tabuleiro))))))
+
+
+(defun avaliacao (no)
+  "Função que avalia o estado do tabuleiro dando importância ao número de caixas que são possíveis de serem fechadas no estado atual. Quanto maior for o número, maior é a avaliação.
+   O ideaia é maximizar o nº de caixas prontas para fechar para o jogador atual e minimiza-las ao outro jogador também como minimizar jogadas que dão origem a caixas quase fechadas para o outro jogador"
+  (- (* 10 (n-caixas-quase-fechadas (no-tabuleiro no))) (n-caixas-semi-fechadas (no-tabuleiro no)))
+)

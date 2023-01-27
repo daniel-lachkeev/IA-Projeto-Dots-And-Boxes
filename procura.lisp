@@ -1,58 +1,44 @@
-; Feito com ajuda de um colega que já fez IA
-(defun novo-sucessor (teste x)
-  (let ((novo-estado (funcall x (no-estado teste))))
-    (cond ((null novo-estado) nil)
-          (t (list novo-estado (1+ (no-profundidade teste)) teste)))))
+;; Implementado por Rafael Palma
+;; Adaptado por Daniel Lachkeev
 
-(defun sucessores (no operadores algoritmo &optional profundidade)
-  (cond ((and profundidade (eq algoritmo 'dfs) (>= (nivel-no no) profundidade)) nil)
-        (t (remove nil
-            (mapcar #'(lambda (operador) (novo-sucessor no operador)) operadores)))))
+(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (alfa most-negative-double-float) (beta most-positive-double-float))
+  (list estado alfa beta profundidade pai))
 
-(defun nivel-no (no)
-  (cadr no))
+(defun no-pai (no) (car (cddddr no)))
 
-(defun abertos-bfs (abertos sucessores)
-  (append abertos sucessores))
+(defun no-alpha (no) (cadr no))
 
-(defun abertos-dfs (abertos sucessores)
-  (append sucessores abertos))
+(defun no-beta (no) (caddr no))
 
-(defun no-existep (no lista algoritmo)
-  (cond ((null lista) nil)
-        ((and (or (eq algoritmo 'bfs) (<= (nivel-no (car lista)) (nivel-no no)))
-              (equal (no-estado (car lista)) (no-estado no))) t)
-        (t (no-existep no (cdr lista) algoritmo))))
+(defun no-profundidade (no) (cadddr no))
 
-(defun bfs (no-inicial objetivop sucessoresf operadores &optional abertos fechados)
-  (if (funcall objetivop no-inicial)
-      no-inicial
-      (let ((nos-succ (remove-if #'(lambda (x) (or (no-existep x abertos 'bfs)
-                                                   (no-existep x fechados 'bfs)))
-                                 (funcall sucessoresf
-                                          no-inicial operadores 'bfs))))
-        (cond ((and (null nos-succ) (null abertos)) nil)
-              ((null abertos)
-               (bfs (car nos-succ) objetivop sucessoresf operadores
-                    (cdr nos-succ) (cons no-inicial fechados)))
-              (t (bfs (car abertos) objetivop sucessoresf operadores
-                      (abertos-bfs (cdr abertos) nos-succ)
-                      (cons no-inicial fechados)))))))
-
-(defun dfs (no-inicial objetivop sucessoresf operadores profundidade
-            &optional (abertos nil) (fechados nil))
-  (if (funcall objetivop no-inicial)
-      no-inicial
-      (let ((nos-succ (remove-if #'(lambda (x) (or (no-existep x abertos 'dfs)
-                                                   (no-existep x fechados 'dfs)))
-                                 (funcall sucessoresf
-                                          no-inicial operadores 'dfs profundidade))))
-        (cond ((and (null nos-succ) (null abertos)) nil)
-              ((null nos-succ)
-               (dfs (car abertos) objetivop sucessoresf operadores
-                    profundidade (cdr abertos) (cons no-inicial fechados)))
-              (t (dfs (car nos-succ) objetivop sucessoresf operadores
-                      profundidade (abertos-dfs abertos (cdr nos-succ))
-                      (cons no-inicial fechados)))))))
-
-
+(defun alpha-beta (no profundidade-maxima jogador)
+  (let* ((enemy (trocar-jogador jogador)))
+    (labels ((maximize (sucessores alpha beta profundidade adversario)
+               (if (null sucessores)
+                   alpha
+                 (let* ((no (car sucessores))
+                        (alpha (max alpha (iter no (+ profundidade 1) alpha beta adversario))))
+                   (if (<= beta alpha)
+                       alpha
+                     (maximize (cdr sucessores) alpha beta profundidade adversario)))))
+             (minimize (sucessores alpha beta profundidade adversario)
+               (if (null sucessores)
+                   beta
+                 (let* ((no (car sucessores))
+                        (beta (min alpha (iter no (+ profundidade 1) alpha beta adversario))))
+                   (if (<= beta alpha)
+                       beta
+                     (minimize (cdr sucessores) alpha beta profundidade adversario)))))
+             (iter (no profundidade
+                       &optional (alpha most-negative-double-float) (beta most-positive-double-float) adversario)
+               (let ((novos-sucessores (sucessores-alphabeta no))
+                     (solucao (estado-solucao (no-tabuleiro no))))
+                 (cond ((null novos-sucessores) 0)
+                       ((and (not (null solucao)) (= solucao jogador)) 9999)
+                       ((and (not (null solucao)) (= solucao adversario)) (- 9999))
+                       ((= profundidade profundidade-maxima) (avaliacao no))
+                       ((/= jogador enemy)
+                        (maximize novos-sucessores alpha beta profundidade (trocar-jogador jogador)))
+                       (t (minimize novos-sucessores alpha beta profundidade jogador))))))
+      (iter no 0))))
