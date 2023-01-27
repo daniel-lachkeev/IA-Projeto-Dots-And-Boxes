@@ -1,4 +1,3 @@
-
 (defun tabuleiro-teste ()
   "Retorna um tabuleiro 3x3 (3 arcos na vertical por 3 arcos na horizontal)
   1 caixa fechada, 10 arcos"
@@ -77,11 +76,6 @@
 '((((0 1 1 1 1 2) (1 2 1 1 1 1) (1 1 2 1 2 1) (1 1 1 1 2 1) (2 2 2 1 2 2) (2 1 1 1 1 2)) ((1 2 1 2 1) (1 1 2 1 1) (1 1 1 2 1) (2 2 1 2 2) (1 2 2 1 2) (1 1 1 2 2) (1 2 1 1 1))) (0 1))
 )
 
-
-(defvar abertos '())
-(defvar fechados '())
-(defvar a (tabuleiro-teste4))
-
 ;; Função que gera um tabuleiro de qualquer tamanho
 ;; O tabuleiro vai ter n x m caixas.
 ;; Para n = 5, m = 6, deve gerar 6x6 + 7x5 arcos, 71 arcos
@@ -95,7 +89,6 @@
 (defun linha-arcos (n)
   (cond ((= n 0) '())
         (t (cons 0 (linha-arcos (1- n))))))
-
 
 (defun tabuleiro-30-caixas ()
 	(tabuleiro 5 6))
@@ -246,8 +239,8 @@
    	(gerar-jogadas (cons (cdar lista) (cdr lista)) (cons (list y x) jogadas) (1+ x) y))
    (t (gerar-jogadas (cons (cdar lista) (cdr lista)) jogadas (1+ x) y))))
 
-(defun novo-sucessor (no operador x y)
-  (let ((novo-tabuleiro (funcall operador x y (no-tabuleiro no))))
+(defun novo-sucessor (no operador x y jogador)
+  (let ((novo-tabuleiro (funcall operador x y (no-tabuleiro no) jogador)))
     (cond ((null novo-tabuleiro) nil)
     	(t (cria-no-alphabeta 
     		(list novo-tabuleiro (second (first no))) 
@@ -256,16 +249,17 @@
 ))))
 
 
-(defun sucessores-operador (jogadas no operador)
-  (mapcar (lambda (coord) (novo-sucessor no operador (car coord) (cadr coord))) jogadas)
+(defun sucessores-operador (jogadas no operador jogador)
+  (mapcar (lambda (coord) (novo-sucessor no operador (car coord) (cadr coord) jogador)) jogadas)
 )
 
-(defun sucessores-alphabeta (no)
+(defun sucessores-alphabeta (no jogador)
   (cond
    ((null no) nil)
    (t (append 
-       (sucessores-operador (gerar-jogadas (get-arcos-horizontais (no-tabuleiro no)) '()) no #'arco-horizontal)
-       (sucessores-operador (gerar-jogadas (get-arcos-verticais (no-tabuleiro no)) '()) no #'arco-vertical)))))
+       (sucessores-operador (gerar-jogadas (get-arcos-horizontais (no-tabuleiro no)) '()) no #'arco-horizontal jogador)
+       (sucessores-operador (gerar-jogadas (get-arcos-verticais (no-tabuleiro no)) '()) no #'arco-vertical jogador)
+))))
 
 (defun sucessores-jogadas (estado)
   (cond

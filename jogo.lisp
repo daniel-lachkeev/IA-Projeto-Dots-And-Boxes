@@ -4,7 +4,7 @@
 
 (defun main-menu ()
 ;; Gera o menu inicial do programa onde se faz o arranque dos estados e variáveis
-  (setf *estado* (limpar-estado))
+  (setf *estado* (list (tabuleiro-teste4) '(0 0)))
   ;(setf *estado* (estado-teste))
   (format t "~%+-------------------------+~%")
   (format t "|       Dots & Boxes      |~%")
@@ -42,17 +42,27 @@
           (setf *jogador* 1)
           (setf *humano-jogador* jogador-primeiro)
           (imprimir-estado *estado*)
+          (escrever-log "----------------------------------")
+          (escrever-log "Início da partida - Humano Vs CPU")
+          (escrever-log (prin1-to-string *estado*))
   ; Loop principal do jogo
           (loop while (null (tabuleiro-preenchidop (car *estado*)))
                 do (progn 
-                     (jogar *estado*)
+                     (escrever-log (prin1-to-string (jogar *estado*)))
                      (imprimir-estado *estado*)))
           (fim-do-jogo *estado*)
+          (escrever-log (prin1-to-string *estado*))
+          (escrever-log "Fim da partida - Humano Vs CPU")
+          (escrever-log "----------------------------------")
           (values)
 )))))
 
 ;; Menu Vs CPU
-(defun vs-cpu ())
+(defun cpu-vs-cpu ()
+  (progn
+    (format t "CPU vs CPU não está implementado")
+    (main-menu)
+))
 
 ;; Equivalente a função input do python
 (defun ler-input(texto)
@@ -104,14 +114,20 @@
        (t (setf *estado* (estado-incrementar-caixas estado-novo (- caixas-novo caixas-antigo) *jogador*)))
 ))))
 
+(defun escrever-log (texto)
+  (with-open-file (stream "C:\\Users\\Daniel\\OneDrive\\Desktop\\IA\\log.dat" :direction :output :if-exists :append)
+    (write-string texto stream)
+    (terpri stream)
+))
+
 
 (defun jogada-humano (estado)
   (progn
     (let ((jogada (ler-jogada (car estado))))
-      (atualizar-estado estado (aplicar-jogada estado jogada)))
+      (atualizar-estado estado (aplicar-jogada estado jogada))
     ;(imprimir-estado *estado*)
-    (values)
-))
+    (list jogada *estado*)
+)))
 
 (defun aplicar-jogada (estado jogada)
   (list (funcall (third jogada) (first jogada) (second jogada) (estado-tabuleiro estado) *jogador*) (second estado))
@@ -119,23 +135,19 @@
 
 ;; Devolve uma jogada aleatória para efeitos de teste
 (defun jogada-aleatoria (estado)
-  (let ((jogadas (sucessores-jogadas estado)))
+  (let ((jogada (nth (random (length (sucessores-jogadas estado))) (sucessores-jogadas estado))))
     (progn
-      (atualizar-estado estado (aplicar-jogada estado (nth (random (length jogadas)) jogadas)))
-      ;(imprimir-estado *estado*)
-      (values)
+      (atualizar-estado estado (aplicar-jogada estado jogada))
+      (list jogada estado)
 )))
-      
 
 
 ;;Devolve uma lista em que o primeiro elemento é uma jogada realizada e o segundo elemento o novo estado
 ;;do jogo resultante da aplicação da jogada.
 (defun jogar (estado)
   (cond
-   ((and (= *jogador* 1) (= *humano-jogador* 1)) (jogada-humano estado))
-   ((and (= *jogador* 2) (= *humano-jogador* 1)) (jogada-aleatoria estado))
-   ((and (= *jogador* 1) (= *humano-jogador* 2)) (jogada-aleatoria estado))
-   ((and (= *jogador* 2) (= *humano-jogador* 2)) (jogada-humano estado))
+   ((= *jogador* *humano-jogador* ) (jogada-humano estado))
+   ((/= *jogador* *humano-jogador*) (jogada-aleatoria estado))
    (t nil)
   ; Verificar se o jogador atual é humano ou CPU
   ; Caso for humano, usar jogada-humano
