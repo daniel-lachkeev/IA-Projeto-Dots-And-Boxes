@@ -26,7 +26,7 @@ Joaquim Filipe
 ### 1.2 Convenções
 
 - `funções` - escritas em letra minúscula com palavras separadas por `"-"`.
-- Utilização de recursividade sempre que é possível exceto nos casos de interação e input/output.
+- Utilização de recursividade sempre que é possível, exceto nos casos de interação e input/output.
 
 ## 2. Introdução
 
