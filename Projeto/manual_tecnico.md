@@ -14,47 +14,43 @@ Joaquim Filipe
 
 ## 1. Arquitetura do Sistema
 
-- `procura.lisp` - ficheiro que contém a implementação dos algoritmos utilizados pelo programa (utiliza diversas funções de `puzzle.lisp`);
+- `procura.lisp` - ficheiro que contém a implementação dos algoritmos de procura utilizados pelo programa (utiliza diversas funções de `puzzle.lisp`);
 - `jogo.lisp` - ficheiro que contém os menus de interação com o utilizador e que lhe permite jogar (utiliza diversas funções de `procura.lisp` e `puzzle.lisp`);
-- `puzzle.lisp` - ficheiro que contém as funcionalidades do programa (utiliza funções ligeiras de `procura.lisp`).
+- `puzzle.lisp` - ficheiro que contém a definição do estado e as operações (utiliza funções ligeiras de `procura.lisp`).
 
 ## 2. Entidades e sua Implementação
 
-- `Tabuleiro` - lista composta por duas sublistas (arcos horizontais e arcos verticais).
-- `Pontuação` - lista composta por dois valores (caixas fechadas pelo Jogador 1 e caixas fechadas pelo Jogador 2).
+- `Tabuleiro` - composto por duas sublistas (arcos horizontais e arcos verticais).
+- `Pontuação` - composto por dois valores (caixas fechadas pelo Jogador 1 e caixas fechadas pelo Jogador 2).
 - `Jogador` - utilizador do programa ou o próprio computador (representado por "1" ou "2").
-- `Estado` - lista composta pelo tabuleiro de jogo e pelas pontuações dos jogadores.
-- `Nó (Alfabeta)` - lista composta pelo estado, pelos valores de `alfa` e de `beta`, pela sua profundidade e pelo seu nó-pai.
+- `Estado` - composto pelo tabuleiro de jogo e pelas pontuações dos jogadores.
+- `Nó (Alfabeta)` - composto pelo estado, pelos valores de `alfa` e de `beta`, pela sua profundidade e pelo seu nó-pai.
 
 ## 3. Algoritmos e sua Implementação
 
+Em todos os ficheiros, qualquer função que acaba em "-teste" devolve uma estrutura iniciliazada com valores pre-definidos.
+
 ### 3.1 puzzle.lisp
 
-- `tabuleiro-teste` - função que retorna um tabuleiro de teste (3x3, com 10 arcos e 1 caixa fechada).
-- `tabuleiro-teste2` - função que retorna um tabuleiro de teste (3x3, com 15 arcos e 5 caixas fechadas).
-- `tabuleiro-teste3` - função que retorna um tabuleiro de teste (3x3, com 19 arcos e 5 caixas fechadas).
-- `tabuleiro-teste4` - função que retorna um tabuleiro de teste (5x6, com 51 arcos e 12 caixas fechadas).
-- `tabuleiro-teste5` - função que retorna um tabuleiro de teste (5x6, com 71 arcos e todas as caixas fechadas).
-- `estado-teste` - função que retorna um estado, com falta de uma última jogada.
 - `tabuleiro` - função que retorna um lista composta por duas sublistas de arcos.
-- `arcos` - função auxiliar de `tabuleiro`, que retorna uma lista de arcos.
+- `arcos` - função auxiliar de `tabuleiro`, que retorna um conjunto de linhas de arcos.
 - `linha-arcos` - função auxiliar de `arcos`, que retorna uma linha de arcos.
 - `tabuleiro-30-caixas` - função que retorna um tabuleiro com 30 caixas.
 - `get-arcos-horizontais` - função que retorna os arcos horizontais de um tabuleiro.
 - `get-arcos-verticais` - função que retorna os arcos verticais de um tabuleiro.
 - `get-arco-na-posicao2` - função que retorna um arco numa determinada posição, que normaliza os valores do tabuleiro para um só valor.
-- `substituir` - função que substitui um arco, de forma recursiva.
+- `substituir` - função que substitui um arco.
 - `arco-na-posicao` - função para inserção de um arco, numa determinada posição.
-- `verificar-arcop` - função que verifica se é possível inserir um arco, numa determinada posição.
-- `arco-horizontal` - função para inserção de um arco horizontal.
-- `arco-vertical` - função para inserção de um arco vertical.
-- `criar-posicoes` - função que retorna todas as posições possíveis, a partir dos arcos horizontais, no formato:
+- `verificar-arcop` - predicado que verifica se é possível inserir um arco, numa determinada posição.
+- `arco-horizontal` - operador - inserção de um arco horizontal.
+- `arco-vertical` - operador - inserção de um arco vertical.
+- `criar-posicoes` - função auxiliar que retorna todas as posições possíveis, a partir dos arcos horizontais, no formato:
 
 ``` lisp
 ((1 1) (1 2) (1 3) (2 1) [...])
 ```
 
-- `posicoes-caixas` - função que retorna todas as posições preparadas para a contagem de caixas (função auxiliar, para determinar caixas fechadas).
+- `posicoes-caixas` - função auxiliar que retorna todas as posições preparadas para a contagem de caixas.
 - `caixa-fechada` - função que determina se uma caixa está fechada, segundo uma determinada posição.
 - `caixas-fechadas` - função que determina as caixas fechadas de um tabuleiro, começando numa determinada posição.
 - `n-caixas-fechadas` - função que retorna as caixas fechadas de um tabuleiro.
@@ -97,16 +93,32 @@ Joaquim Filipe
 - `no-beta` - função que retorna o valor de beta de um nó. 
 - `no-profundidade` - função que retorna a profundidade de um nó. 
 - `alpha-beta` - função que implementa o algoritmo Alfabeta.
+Foram definidas 3 funções locais que executam o algoritmo principal iter. Em caso de se alcançar a profundidade máxima ou condição de vitória (preenchimento do tabuleiro) é devolvida uma avalição que representa quão bom é o estado atual comparado com o outro jogador. 
+Para os cortes alfa-beta são chamadas novamente as funções respetivas para o resto dos sucessores ignorando o atual. 
+
+Em profundidade 3 de um nó inicial usando como base a figura 1 isto é as estatísticas.
+```
+Timing the evaluation of (ALPHA-BETA (NO-TESTE) 3 1)
+
+User time    =        0.218
+System time  =        0.000
+Elapsed time =        0.215
+Allocation   = 88625536 bytes
+0 Page faults
+GC time      =        0.000
+70```
 
 ### 3.3 jogo.lisp
 
 - `main-menu` - função responsável por gerar o menu inicial da aplicação.
 - `player-vs-cpu` - função responsável por gerar o menu para indicação da duração de um turno e de quem joga primeiro.
+- `cpu-vs-cpu` - função não implementada responsável por fazer um jogo entre 2 computadores.
 - `ler-input` - função para leitura do teclado.
 - `trocar-jogador` - função auxiliar de `proximo-jogador`.
 - `proximo-jogador` - função que alterna entre o Jogador 1 e o Jogador 2.
 - `ler-joagada` - função que pede um arco ao jogador, para o inserir no tabuleiro de jogo.
 - `atualizar-estado` - função que a atualiza o estado, ao mesmo tempo que incrementa a pontuação de um jogador, caso o mesmo tenha fechado caixas.
+- `escrever-log` - função que escreve no ficheiro log.dat de um caminho pre-definido uma string de texto.
 - `jogada-humano` - função que lê e aplica a jogada de um utilizador.
 - `aplicar-jogada` - função que retorna um estado, depois de uma jogada.
 - `jogada-aleatória` - função que aplica a jogada do computador.
@@ -129,11 +141,19 @@ Joaquim Filipe
 
 ## 4. Descrição das Opções Tomadas
 
-Preencher.
+O foco primário foi garantir que todas as operações e funções auxiliares para o procedimento do jogo estivessem implementadas de forma correta.
+De seguida foi desenvolvida a codificação das regras e processos do jogo de modo que possamos ter um ciclo de jogadas até a condição de vitória.
+Por último quando o jogo conseguia minimamente correr até o final, procedemos a implementação do algoritmo alfabeta.
+
+Em muitas funções de alto nível, há a utilização de várias funções auxiliares encadeadas. A invocação de funções recursivas exige uma função de maior nível quando se pretende obter o resultado final. Isto é porque a utilização de scopes de funções não era algo evidente até o final do desenvolvimento. 
+
+
+
 
 ## 5. Limitações
 
-- Gerar sucessores de um nó;
-- Correr algoritmos de pesquisa apesar de estarem implementados;
-- A* não está totalmente implementado;
+- Sem possibilidade de devolver a próxima jogada ótima do computador apesar de alfabeta estar implementado.
+- Sem otimizações de alfabeta como por exemplo pesquisa quiscente e ordenação de nós.
+- Não há métricas de desempenho tal como o limite de tempo.
+- Utilização de variáveis globais em detrimento de scopes locais.
 ...
