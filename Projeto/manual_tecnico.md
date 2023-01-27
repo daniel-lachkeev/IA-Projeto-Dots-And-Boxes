@@ -83,7 +83,7 @@ Joaquim Filipe
 - `estado-incrementar-caixas` - função que incrementa o número de caixas fechadas pelo Jogador 1 e pelo Jogador 2.
 - `estado-resultado` - função que indica o vencedor, avaliando as pontuações.
 - `limpar-estado` - função que limpa o estado.
-- `tabuleiro-preenchidop` - função que verifica se um tabuleiro de encontra totalmente preenchido.
+- `tabuleiro-preenchidop` - função que verifica se um tabuleiro de jogo encontra totalmente preenchido.
 - `estado-solucao` - função que verifica se um jogo terminou e indica o vencedor.
 - `linhas-max` - função que retorna o número máximo de linhas que um tabuleiro pode ter.
 - `n-linhas` - função que retorna o número de linhas preenchidas, num tabuleiro.
