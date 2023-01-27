@@ -174,4 +174,3 @@ Para a escrita de ficheiros, optou-se por usar um caminho hardcoded visto que n�
 - Sem otimizações de alfabeta como por exemplo pesquisa quiscente, ordenação de nós e memoização.
 - Não há limite de tempo implementado visto que não há jogadas de computador que usem alfa-beta.
 - Utilização de variáveis globais em detrimento de scopes locais.
-...
